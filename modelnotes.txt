@@ -1,0 +1,7 @@
+| Your Goal             | Model               |
+| --------------------- | ------------------- |
+| Fast & reliable       | **ResNet50**        |
+| Best accuracy         | **EfficientNet-B3** |
+| Mobile / Edge         | **MobileNetV2**     |
+| Similar-looking parts | **DenseNet121**     |
+| Research / advanced   | **ViT**             |
