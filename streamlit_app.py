@@ -136,7 +136,7 @@ def classify_image(image):
     interpreter.invoke()
     output_data = interpreter.get_tensor(output_details[0]['index'])
     
-    class_idx = np.argmax(output_data)
+    class_idx = np.argmax(output_data[0])
     class_prob = output_data[0][class_idx] * 100
     class_name = class_names.get(class_idx, "Unknown Class")
     
@@ -179,16 +179,29 @@ def create_prediction_chart(top_5):
 
 # Sidebar
 with st.sidebar:
+    # Display hero image
+    try:
+        from pathlib import Path
+        assets_path = Path("assets")
+        # Try to find an image in assets folder
+        image_files = list(assets_path.glob("*.jpeg")) + list(assets_path.glob("*.jpg")) + list(assets_path.glob("*.png"))
+        if image_files:
+            st.image(str(image_files[0]), use_column_width=True, caption="🚗 Automotive Parts")
+            st.markdown("---")
+    except:
+        pass
+    
     st.markdown("### 🎨 About This App")
     st.info(
         "🚗 **Auto Parts Image Classifier**\n\n"
         "A deep learning model trained to identify 40 different auto parts "
-        "with 93.5% accuracy.\n\n"
+        "with 98.0% accuracy using MobileNetV2.\n\n"
         "**Features:**\n"
         "✅ Real-time classification\n"
         "✅ Top 5 predictions\n"
         "✅ Confidence scores\n"
-        "✅ Batch processing"
+        "✅ Batch processing\n"
+        "✅ Interactive gallery"
     )
     
     st.markdown("### 📊 Model Information")
@@ -196,12 +209,17 @@ with st.sidebar:
     with col1:
         st.metric("Classes", "40", "parts")
     with col2:
-        st.metric("Accuracy", "93.5%", "test set")
+        st.metric("Accuracy", "98.0%", "MobileNetV2")
     
     st.markdown("### 📋 Available Classes")
     with st.expander("View all 40 classes", expanded=False):
-        classes_text = ", ".join(list(class_names.values()))
-        st.text(classes_text)
+        # Display classes vertically with numbers
+        classes_list = list(class_names.values())
+        classes_html = "<ol style='columns: 2; column-gap: 30px;'>"
+        for idx, class_name in enumerate(classes_list, 1):
+            classes_html += f"<li>{class_name}</li>"
+        classes_html += "</ol>"
+        st.markdown(classes_html, unsafe_allow_html=True)
     
     st.markdown("---")
     st.markdown("### ⚙️ Settings")
@@ -217,6 +235,16 @@ with st.sidebar:
 # Main header
 st.markdown("# 🚗 Auto Parts Image Classifier")
 st.markdown("### *Identify car parts instantly with AI*")
+
+# Display model info banner
+col_banner1, col_banner2, col_banner3 = st.columns(3)
+with col_banner1:
+    st.metric("🧠 Primary Model", "MobileNetV2", "98.0% Accuracy")
+with col_banner2:
+    st.metric("📊 Classes", "40 Auto Parts", "Balanced Dataset")
+with col_banner3:
+    st.metric("⚡ Speed", "TFLite", "Optimized")
+
 st.markdown("---")
 
 # Tabs for different modes
@@ -395,8 +423,7 @@ with tab2:
                 st.dataframe(df_results, use_container_width=True, hide_index=True)
 
 with tab3:
-    st.markdown("## Image Gallery")
-    st.info("Classify and view images from the input folder")
+    st.markdown("## 🖼️ Image Gallery")
     
     input_path = Path("input")
     image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif'}
@@ -406,31 +433,66 @@ with tab3:
     if not image_files:
         st.warning("📁 No images found in the input folder")
     else:
-        st.markdown(f"Found {len(image_files)} image(s)")
+        # Gallery header with stats
+        col_header1, col_header2 = st.columns([3, 1])
+        with col_header1:
+            st.markdown(f"### 📸 Displaying {len(image_files)} image(s)")
+        with col_header2:
+            cols_per_row = st.select_slider(
+                "Grid Size",
+                options=[2, 3, 4, 5],
+                value=3,
+                key="gallery_grid"
+            )
         
-        # Create a grid
-        cols_per_row = 3
-        for i in range(0, len(image_files), cols_per_row):
-            cols = st.columns(cols_per_row)
+        st.markdown("---")
+        
+        # Create gallery with enhanced styling
+        cols_per_row_actual = cols_per_row
+        for i in range(0, len(image_files), cols_per_row_actual):
+            cols = st.columns(cols_per_row_actual, gap="medium")
             
             for col_idx, col in enumerate(cols):
                 if i + col_idx < len(image_files):
                     image_file = image_files[i + col_idx]
                     
                     with col:
-                        image = Image.open(image_file).convert('RGB')
-                        st.image(image, width=600)
+                        # Image container with border
+                        st.markdown(
+                            f'<div style="border: 3px solid #667eea; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);">',
+                            unsafe_allow_html=True
+                        )
                         
-                        with st.spinner(f"Classifying {image_file.name}..."):
+                        image = Image.open(image_file).convert('RGB')
+                        st.image(image, use_column_width=True)
+                        
+                        st.markdown('</div>', unsafe_allow_html=True)
+                        
+                        # Classify with progress
+                        with st.spinner(f"🔍 Analyzing..."):
                             class_name, class_prob, _, top_5 = classify_image(image)
                         
+                        # Result card with dynamic color based on confidence
+                        confidence_color = "#2ecc71" if class_prob >= 80 else "#f39c12" if class_prob >= 60 else "#e74c3c"
                         st.markdown(f"""
-                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                    padding: 10px; border-radius: 5px; color: white; text-align: center;">
-                            <b>{class_name}</b><br>
-                            {class_prob:.1f}%
+                        <div style="background: linear-gradient(135deg, {confidence_color}99 0%, {confidence_color}dd 100%); 
+                                    padding: 15px; border-radius: 8px; color: white; text-align: center; margin-top: 10px;">
+                            <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">{class_name}</div>
+                            <div style="font-size: 24px; font-weight: bold;">{class_prob:.1f}%</div>
+                            <div style="font-size: 12px; margin-top: 8px; opacity: 0.9;">Confidence Score</div>
                         </div>
                         """, unsafe_allow_html=True)
+                        
+                        # File name
+                        st.caption(f"📄 {image_file.name}")
+                        
+                        # Top 3 predictions dropdown
+                        with st.expander("🔝 Top Predictions"):
+                            top_3_df = pd.DataFrame(top_5[:3], columns=['Part', 'Confidence (%)'])
+                            top_3_df['Confidence (%)'] = top_3_df['Confidence (%)'].apply(lambda x: f"{x:.2f}%")
+                            top_3_df['Rank'] = ['🥇', '🥈', '🥉']
+                            top_3_df = top_3_df[['Rank', 'Part', 'Confidence (%)']]
+                            st.dataframe(top_3_df, use_container_width=True, hide_index=True)
 
 # Footer
 st.markdown("---")
@@ -438,11 +500,11 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.markdown("### 📊 Model Performance")
-    st.markdown("**Training Set:** 6,917 images\n**Validation Set:** 200 images\n**Test Set:** 200 images\n**Accuracy:** 93.5%")
+    st.markdown("**Training Set:** 6,917 images\n**Validation Set:** 200 images\n**Test Set:** 200 images\n**MobileNetV2:** 98.0%\n**EfficientNet:** 96.5%")
 
 with col2:
     st.markdown("### 🏗️ Architecture")
-    st.markdown("**Base Model:** MobileNetV2\n**Fine-tuned Layers:** 3\n**Total Parameters:** ~3M\n**Format:** TensorFlow Lite")
+    st.markdown("**Primary Model:** MobileNetV2\n**Fine-tuned Layers:** 3\n**Total Parameters:** ~3M\n**Format:** TensorFlow Lite (Optimized)\n**Alternative:** EfficientNet (96.5%)")
 
 with col3:
     st.markdown("### 📚 Dataset")

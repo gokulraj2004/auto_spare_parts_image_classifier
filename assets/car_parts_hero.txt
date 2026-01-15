@@ -1,0 +1,1 @@
+Car parts image file - for reference in streamlit app
