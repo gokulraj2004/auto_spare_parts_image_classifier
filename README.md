@@ -1,7 +1,7 @@
 # 🚗 Auto Parts Image Classifier
+<img width="1850" height="960" alt="image" src="https://github.com/user-attachments/assets/63c64d61-ec1f-472c-98c9-ae0b2ea00131" />
 
 A powerful deep learning application for identifying 40 different automotive parts from images. Built with Streamlit, TensorFlow, and optimized for real-time predictions.
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/63c64d61-ec1f-472c-98c9-ae0b2ea00131" />
 
 ## 🌟 Features
 
