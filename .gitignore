@@ -48,3 +48,8 @@ models/*.pkl
 # Outputs (optional – ignore if regenerated)
 # --------------------
 # output/
+# Generated outputs
+output/
+
+# Test images
+test examples/
