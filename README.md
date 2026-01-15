@@ -2,7 +2,6 @@
 
 A powerful deep learning application for identifying 40 different automotive parts from images. Built with Streamlit, TensorFlow, and optimized for real-time predictions.
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/63c64d61-ec1f-472c-98c9-ae0b2ea00131" />
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/33b413b9-0382-4c04-b77c-687fafd8d2d3" />
 
 ## 🌟 Features
 
