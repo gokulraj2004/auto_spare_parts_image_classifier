@@ -191,7 +191,7 @@ The model may struggle with:
 | Model | Accuracy | File Size | Speed | Training Notebook |
 |-------|----------|-----------|-------|-------------------|
 | **MobileNetV2** | **98.0%** ✅ | ~5MB | Very Fast | `transfer-learning-using-mobilenetv2-acc-99-08.ipynb` |
-| **EfficientNet** | **96.5%** | ~15MB | Fast | `auto_parts_EDA.ipynb` |
+| **EfficientNet** | **96.5%** | ~15MB | Fast |  |
 
 The MobileNetV2 model is deployed in the Streamlit app for optimal balance between accuracy and performance.
 
