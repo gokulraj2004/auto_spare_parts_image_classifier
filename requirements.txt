@@ -1,3 +1,10 @@
+streamlit
 tensorflow
+tensorflow-intel
 pillow
 numpy
+pandas
+plotly
+scikit-learn
+opencv-python
+scipy
